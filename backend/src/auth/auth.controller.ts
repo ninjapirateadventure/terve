@@ -1,36 +1,44 @@
-import { Controller, Get, Post, UseGuards, Request, Response } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+export class SimpleLoginDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Start Google OAuth flow' })
-  async googleAuth() {
-    // Passport will handle the redirect
+  @Post('simple-login')
+  @ApiOperation({ summary: 'Simple login with email and name' })
+  async simpleLogin(@Body() loginDto: SimpleLoginDto) {
+    return this.authService.simpleLogin(loginDto);
   }
 
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Google OAuth callback' })
-  async googleAuthCallback(@Request() req, @Response() res) {
-    const loginResult = await this.authService.login(req.user);
-    
-    // Redirect to frontend with token
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const redirectUrl = `${frontendUrl}/auth/callback?token=${loginResult.access_token}`;
-    
-    return res.redirect(redirectUrl);
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user profile' })
+  async getProfile(@Request() req) {
+    return req.user;
   }
 
-  @Post('logout')
-  @ApiOperation({ summary: 'Logout user' })
-  async logout() {
-    return { message: 'Logged out successfully' };
+  @Get('status')
+  @ApiOperation({ summary: 'Check authentication status' })
+  getStatus(@Request() req) {
+    return {
+      authenticated: !!req.user,
+      user: req.user || null,
+    };
   }
 }
