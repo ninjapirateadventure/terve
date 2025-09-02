@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: terve-db
+    environment:
+      POSTGRES_DB: terve
+      POSTGRES_USER: terve_user
+      POSTGRES_PASSWORD: terve_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - terve-network
+
+  # Nest.js Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: terve-backend
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://terve_user:terve_password@database:5432/terve
+      - JWT_SECRET=your-jwt-secret-key
+      - GOOGLE_CLIENT_ID=your-google-client-id
+      - GOOGLE_CLIENT_SECRET=your-google-client-secret
+      - CLAUDE_API_KEY=your-claude-api-key
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      - ./backend/nest-cli.json:/app/nest-cli.json
+    depends_on:
+      - database
+    networks:
+      - terve-network
+    command: npm run start:dev
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: terve-frontend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/next.config.js:/app/next.config.js
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/postcss.config.js:/app/postcss.config.js
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+    depends_on:
+      - backend
+    networks:
+      - terve-network
+    command: npm run dev
+
+  # Redis for session management (optional, can use in-memory for development)
+  redis:
+    image: redis:7-alpine
+    container_name: terve-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - terve-network
+
+volumes:
+  postgres_data:
+
+networks:
+  terve-network:
+    driver: bridge
