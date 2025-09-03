@@ -109,6 +109,23 @@ export default function HomePage() {
             </Link>
 
             <Link
+              href="/test"
+              className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-6 border border-gray-200"
+            >
+              <div className="flex items-center mb-4">
+                <div className="bg-indigo-500 p-3 rounded-lg mr-4">
+                  <span className="text-white text-xl">🎯</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  Skill Tests
+                </h3>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Test specific skills with focused practice
+              </p>
+            </Link>
+
+            <Link
               href="/reading"
               className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-6 border border-gray-200"
             >
@@ -150,7 +167,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
               What You'll Learn
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="text-4xl mb-4">🃏</div>
                 <h3 className="text-xl font-semibold mb-2">Smart Flashcards</h3>
@@ -163,6 +180,13 @@ export default function HomePage() {
                 <h3 className="text-xl font-semibold mb-2">Grammar Practice</h3>
                 <p className="text-gray-600">
                   Master Finnish conjugations and noun declensions
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-4">🎯</div>
+                <h3 className="text-xl font-semibold mb-2">Skill Tests</h3>
+                <p className="text-gray-600">
+                  Test your knowledge with focused practice tests
                 </p>
               </div>
               <div className="text-center">

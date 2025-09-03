@@ -59,10 +59,9 @@ export class FlashcardsController {
   }
 
   @Post('initialize')
-  @ApiOperation({ summary: 'Initialize flashcards for a new user' })
+  @ApiOperation({ summary: 'Initialize flashcards for a user' })
   async initializeFlashcards(@Request() req) {
-    await this.flashcardsService.initializeUserFlashcards(req.user.id, req.user.cefrLevel);
-    await this.flashcardsService.ensureLearningCategorySize(req.user.id);
+    await this.flashcardsService.ensureLearningCategorySize(req.user.id, 100);
     return { message: 'Flashcards initialized' };
   }
 

@@ -42,22 +42,37 @@ export default function FlashcardsPage() {
   const initializeFlashcards = async () => {
     if (!user) return
     
+    console.log('Initializing flashcards for user:', user.id)
+    
     try {
       const token = localStorage.getItem('terve_token')
+      console.log('Token exists:', !!token)
+      console.log('Token preview:', token ? token.substring(0, 20) + '...' : 'No token')
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/flashcards/initialize`, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       })
       
+      console.log('Initialize response status:', response.status)
+      
       if (response.ok) {
+        const result = await response.json()
+        console.log('Initialize result:', result)
         setInitialized(true)
         loadCounts()
         loadPracticeCard()
+      } else {
+        const errorText = await response.text()
+        console.error('Initialize failed:', response.status, errorText)
+        alert(`Failed to initialize flashcards: ${response.status} - ${errorText}`)
       }
     } catch (error) {
       console.error('Failed to initialize flashcards:', error)
+      alert(`Error initializing flashcards: ${error.message}`)
     }
   }
 
@@ -93,20 +108,44 @@ export default function FlashcardsPage() {
   const loadCounts = async () => {
     if (!user) return
     
+    console.log('Loading counts for user:', user.id)
+    
     try {
       const token = localStorage.getItem('terve_token')
+      console.log('LoadCounts - Token exists:', !!token)
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/flashcards/counts`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       })
       
+      console.log('Counts response status:', response.status)
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('Counts data:', data)
         setCounts(data)
+      } else {
+        const errorText = await response.text()
+        console.error('Counts failed:', response.status, errorText)
+        // Set empty counts so we show the init button
+        setCounts({
+          LEARNING: 0,
+          WELL_KNOWN: 0,
+          TODO: 0,
+          NOT_INTERESTED: 0
+        })
       }
     } catch (error) {
       console.error('Failed to load counts:', error)
+      // Set empty counts so we show the init button
+      setCounts({
+        LEARNING: 0,
+        WELL_KNOWN: 0,
+        TODO: 0,
+        NOT_INTERESTED: 0
+      })
     }
   }
 
@@ -485,7 +524,23 @@ export default function FlashcardsPage() {
                 `No cards available in ${selectedCategory.toLowerCase().replace('_', ' ')} category`
               )}
             </div>
-            {selectedCategory === 'LEARNING' && counts?.LEARNING === 0 && (
+            
+            {/* Always show initialize button if no cards */}
+            {(!currentCard && (!counts || (counts.LEARNING === 0 && counts.WELL_KNOWN === 0 && counts.TODO === 0 && counts.NOT_INTERESTED === 0))) && (
+              <div className="space-y-3">
+                <button
+                  onClick={initializeFlashcards}
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-medium"
+                >
+                  🎯 Initialize Flashcards
+                </button>
+                <p className="text-sm text-gray-500">
+                  Click to create your first flashcards from Finnish vocabulary
+                </p>
+              </div>
+            )}
+            
+            {selectedCategory === 'LEARNING' && counts?.LEARNING === 0 && counts && (counts.WELL_KNOWN > 0 || counts.TODO > 0 || counts.NOT_INTERESTED > 0) && (
               <button
                 onClick={initializeFlashcards}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-3"

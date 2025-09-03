@@ -33,6 +33,18 @@ export class AuthController {
     return req.user;
   }
 
+  @Get('test-token')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Test JWT token validation' })
+  async testToken(@Request() req) {
+    return {
+      message: 'Token is valid',
+      user: req.user,
+      userId: req.user?.id,
+    };
+  }
+
   @Get('status')
   @ApiOperation({ summary: 'Check authentication status' })
   getStatus(@Request() req) {

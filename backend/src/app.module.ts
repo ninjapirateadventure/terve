@@ -9,11 +9,13 @@ import { WordsModule } from './words/words.module';
 import { FlashcardsModule } from './flashcards/flashcards.module';
 import { ConjugationModule } from './conjugation/conjugation.module';
 import { DeclensionModule } from './declension/declension.module';
+import { TestModule } from './tests/test.module';
 import { User } from './users/user.entity';
 import { Word } from './words/word.entity';
 import { UserFlashcard } from './flashcards/user-flashcard.entity';
 import { Verb } from './conjugation/verb.entity';
 import { Noun } from './declension/noun.entity';
+import { TestSessionEntity } from './tests/test.entity';
 import { WordsService } from './words/words.service';
 import { DeclensionService } from './declension/declension.service';
 
@@ -47,7 +49,7 @@ console.log('');
       username: dbConfig.username,
       password: dbConfig.password,
       database: dbConfig.database,
-      entities: [User, Word, UserFlashcard, Verb, Noun],
+      entities: [User, Word, UserFlashcard, Verb, Noun, TestSessionEntity],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
       // Add extra connection options for debugging
@@ -67,6 +69,7 @@ console.log('');
     FlashcardsModule,
     ConjugationModule,
     DeclensionModule,
+    TestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

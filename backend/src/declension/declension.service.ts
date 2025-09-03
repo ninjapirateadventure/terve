@@ -241,7 +241,7 @@ export class DeclensionService {
     // Get all nouns from database, fallback to supported nouns from engine
     let nouns = await this.nounRepository.find({
       where: { cefrLevel },
-      orderBy: { frequency: 'ASC' }
+      order: { frequency: 'ASC' }
     });
 
     // If no nouns in database, create temporary noun objects from engine

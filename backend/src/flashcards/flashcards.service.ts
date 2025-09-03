@@ -26,6 +26,13 @@ export class FlashcardsService {
   }
 
   async getCategoryCounts(userId: string) {
+    // Auto-initialize if user has no flashcards
+    const totalCount = await this.userFlashcardsRepository.count({ where: { userId } });
+    if (totalCount === 0) {
+      console.log(`Auto-initializing flashcards for user ${userId}`);
+      await this.ensureLearningCategorySize(userId, 100);
+    }
+
     const counts = await this.userFlashcardsRepository.createQueryBuilder('uf')
       .select('uf.category', 'category')
       .addSelect('COUNT(*)', 'count')
