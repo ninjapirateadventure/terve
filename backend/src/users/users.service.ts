@@ -14,6 +14,7 @@ export interface UpdateUserDto {
   name?: string;
   cefrLevel?: CEFRLevel;
   hasCompletedOnboarding?: boolean;
+  googleId?: string;
 }
 
 @Injectable()

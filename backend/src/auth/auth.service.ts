@@ -36,6 +36,34 @@ export class AuthService {
     return this.login(user);
   }
 
+  async validateGoogleUser(profile: any): Promise<User> {
+    console.log('Google OAuth validation for profile:', profile.id);
+    
+    // Find or create user based on Google profile
+    let user = await this.usersService.findByEmail(profile.emails[0].value);
+    
+    if (!user) {
+      console.log('User not found, creating new user from Google profile');
+      // Create new user with Google profile data
+      user = await this.usersService.create({
+        email: profile.emails[0].value,
+        name: profile.displayName || profile.name?.givenName + ' ' + profile.name?.familyName,
+        avatar: profile.photos?.[0]?.value,
+        googleId: profile.id,
+      });
+      console.log('Created user from Google profile:', user);
+    } else {
+      console.log('Found existing user for Google profile:', user);
+      // Update Google ID if not set
+      if (!user.googleId) {
+        user.googleId = profile.id;
+        await this.usersService.update(user.id, { googleId: profile.id });
+      }
+    }
+
+    return user;
+  }
+
   async login(user: User) {
     const payload = { 
       email: user.email, 

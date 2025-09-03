@@ -1,0 +1,61 @@
+  /**
+   * Extracts the stem from a Finnish verb based on its type
+   */
+  extractStem(verb: string, verbType?: VerbType): string {
+    const cleanVerb = verb.toLowerCase().trim();
+    const type = verbType || this.classifyVerb(cleanVerb);
+    
+    switch (type) {
+      case VerbType.TYPE_I:
+        // Remove final vowel: sanoa -> sano, puhua -> puhu
+        return cleanVerb.slice(0, -1);
+        
+      case VerbType.TYPE_II:
+        // Remove -da/-dä: syödä -> syö, juoda -> juo
+        if (cleanVerb.endsWith('da') || cleanVerb.endsWith('dä')) {
+          return cleanVerb.slice(0, -2);
+        }
+        return cleanVerb.slice(0, -1);
+        
+      case VerbType.TYPE_III:
+        // Complex rules for Type III verbs
+        if (cleanVerb.endsWith('nna') || cleanVerb.endsWith('nnä')) {
+          // mennä -> mene (not men)
+          const baseRoot = cleanVerb.slice(0, -3);
+          return baseRoot + 'e';
+        } else if (cleanVerb.endsWith('lla') || cleanVerb.endsWith('llä')) {
+          // tulla -> tule 
+          const baseRoot = cleanVerb.slice(0, -3);
+          return baseRoot + 'e';
+        } else if (cleanVerb.endsWith('rra') || cleanVerb.endsWith('rrä')) {
+          return cleanVerb.slice(0, -2); // purra -> pur
+        } else if (cleanVerb.endsWith('ta') || cleanVerb.endsWith('tä')) {
+          return cleanVerb.slice(0, -2) + 'ua'; // haluta -> halua (with consonant gradation)
+        }
+        return cleanVerb.slice(0, -1);
+        
+      case VerbType.TYPE_IV:
+        // Remove -ata/-ätä: tavata -> tava, hypätä -> hypä
+        if (cleanVerb.endsWith('ata') || cleanVerb.endsWith('ätä')) {
+          return cleanVerb.slice(0, -3);
+        }
+        return cleanVerb.slice(0, -1);
+        
+      case VerbType.TYPE_V:
+        // Remove -ita/-itä and add -tse: tarvita -> tarvitse, valita -> valitse
+        if (cleanVerb.endsWith('ita') || cleanVerb.endsWith('itä')) {
+          return cleanVerb.slice(0, -3) + 'tse';
+        }
+        return cleanVerb.slice(0, -1);
+        
+      case VerbType.TYPE_VI:
+        // Remove -eta/-etä and add -ne: vanheta -> vanhene, kylmetä -> kylmene
+        if (cleanVerb.endsWith('eta') || cleanVerb.endsWith('etä')) {
+          return cleanVerb.slice(0, -3) + 'ne';
+        }
+        return cleanVerb.slice(0, -1);
+        
+      default:
+        return cleanVerb.slice(0, -1);
+    }
+  }

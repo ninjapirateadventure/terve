@@ -7,31 +7,62 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { WordsModule } from './words/words.module';
 import { FlashcardsModule } from './flashcards/flashcards.module';
+import { ConjugationModule } from './conjugation/conjugation.module';
 import { User } from './users/user.entity';
 import { Word } from './words/word.entity';
 import { UserFlashcard } from './flashcards/user-flashcard.entity';
+import { Verb } from './conjugation/verb.entity';
 import { WordsService } from './words/words.service';
+
+// Debug logging
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 5432,
+  username: process.env.DB_USERNAME || 'terve_user',
+  password: process.env.DB_PASSWORD || 'terve_password',
+  database: process.env.DB_NAME || 'terve',
+};
+
+console.log('🔧 Database Configuration:');
+console.log('  Host:', dbConfig.host);
+console.log('  Port:', dbConfig.port);
+console.log('  Username:', dbConfig.username);
+console.log('  Database:', dbConfig.database);
+console.log('  Password:', dbConfig.password ? '[SET]' : '[NOT SET]');
+console.log('');
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env', '../.env'], // Look in both backend and root directories
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'database',
-      port: parseInt(process.env.DB_PORT, 10) || 5432,
-      username: process.env.DB_USERNAME || 'terve_user',
-      password: process.env.DB_PASSWORD || 'terve_password',
-      database: process.env.DB_NAME || 'terve',
-      entities: [User, Word, UserFlashcard],
+      host: dbConfig.host,
+      port: dbConfig.port,
+      username: dbConfig.username,
+      password: dbConfig.password,
+      database: dbConfig.database,
+      entities: [User, Word, UserFlashcard, Verb],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
+      // Add extra connection options for debugging
+      extra: {
+        // Connection timeout
+        connectionTimeoutMillis: 10000,
+        // Idle timeout
+        idleTimeoutMillis: 30000,
+      },
+      // Retry connection attempts
+      retryAttempts: 3,
+      retryDelay: 3000,
     }),
     AuthModule,
     UsersModule,
     WordsModule,
     FlashcardsModule,
+    ConjugationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
