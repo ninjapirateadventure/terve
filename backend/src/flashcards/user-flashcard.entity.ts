@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Word } from '../words/word.entity';
+import { User } from '@/users/user.entity';
+import { Word } from '@/words/word.entity';
 
 export enum FlashcardCategory {
   LEARNING = 'LEARNING',

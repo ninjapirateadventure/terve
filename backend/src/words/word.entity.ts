@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { CEFRLevel } from '../users/user.entity';
+import { CEFRLevel } from '@/users/user.entity';
 
 @Entity('words')
 export class Word {

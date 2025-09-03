@@ -8,11 +8,14 @@ import { UsersModule } from './users/users.module';
 import { WordsModule } from './words/words.module';
 import { FlashcardsModule } from './flashcards/flashcards.module';
 import { ConjugationModule } from './conjugation/conjugation.module';
+import { DeclensionModule } from './declension/declension.module';
 import { User } from './users/user.entity';
 import { Word } from './words/word.entity';
 import { UserFlashcard } from './flashcards/user-flashcard.entity';
 import { Verb } from './conjugation/verb.entity';
+import { Noun } from './declension/noun.entity';
 import { WordsService } from './words/words.service';
+import { DeclensionService } from './declension/declension.service';
 
 // Debug logging
 const dbConfig = {
@@ -44,7 +47,7 @@ console.log('');
       username: dbConfig.username,
       password: dbConfig.password,
       database: dbConfig.database,
-      entities: [User, Word, UserFlashcard, Verb],
+      entities: [User, Word, UserFlashcard, Verb, Noun],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
       // Add extra connection options for debugging
@@ -63,15 +66,20 @@ console.log('');
     WordsModule,
     FlashcardsModule,
     ConjugationModule,
+    DeclensionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
-  constructor(private wordsService: WordsService) {}
+  constructor(
+    private wordsService: WordsService,
+    private declensionService: DeclensionService
+  ) {}
 
   async onModuleInit() {
-    // Seed basic words when the app starts
+    // Seed basic words and nouns when the app starts
     await this.wordsService.seedBasicWords();
+    await this.declensionService.seedBasicNouns();
   }
 }

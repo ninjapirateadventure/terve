@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserFlashcard, FlashcardCategory } from './user-flashcard.entity';
-import { WordsService } from '../words/words.service';
-import { CEFRLevel } from '../users/user.entity';
+import { WordsService } from '@/words/words.service';
+import { CEFRLevel } from '@/users/user.entity';
 
 @Injectable()
 export class FlashcardsService {

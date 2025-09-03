@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Word } from './word.entity';
-import { CEFRLevel } from '../users/user.entity';
+import { CEFRLevel } from '@/users/user.entity';
 
 @Injectable()
 export class WordsService {
